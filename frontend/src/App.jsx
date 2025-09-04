@@ -100,7 +100,7 @@ function App() {
   return (
     <div className="app-container">
       <div className="app-header">
-        <h1>🌬️ Air Quality Forecast</h1>
+        <h1>🌬️ Safe Breath</h1>
         <p>Real-time air quality monitoring and 12-hour predictions</p>
       </div>
       
