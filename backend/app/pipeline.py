@@ -479,7 +479,7 @@ def attach_alerts_and_suggestions(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def run_pipeline(csv_out_path: str = None, hours: int = 72) -> pd.DataFrame:
+def run_pipeline(csv_out_path: str = None, hours: int = 168) -> pd.DataFrame:
     # Prefer Open-Meteo (no API key required) for reliability
     seed = _seed_cities_with_coords()
     all_wide = []
@@ -509,7 +509,7 @@ def run_pipeline(csv_out_path: str = None, hours: int = 72) -> pd.DataFrame:
     return cleaned
 
 
-def scheduler_loop(csv_out_path: str = None, hours: int = 72):
+def scheduler_loop(csv_out_path: str = None, hours: int = 168):
     while True:
         try:
             _ = run_pipeline(csv_out_path=csv_out_path, hours=hours)
@@ -521,6 +521,6 @@ def scheduler_loop(csv_out_path: str = None, hours: int = 72):
 
 if __name__ == "__main__":
     out_csv = os.path.join(os.path.dirname(__file__), "../openaq_72h.csv")
-    df = run_pipeline(csv_out_path=out_csv, hours=72)
+    df = run_pipeline(csv_out_path=out_csv, hours=168)
     print(f"Rows: {len(df)}; Columns: {list(df.columns)}")
 

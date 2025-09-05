@@ -30,7 +30,6 @@ function AQIMap({ hotspots = [], safezones = [], center = [28.6139, 77.2090], zo
   // Generate realistic map points
   const generateMapPoints = () => {
     const points = [];
-    // If center is Ghaziabad, add 5-6 fixed hotspot points
     if (center[0] === 28.6692 && center[1] === 77.4538) {
       const ghaziabadHotspots = [
         { lat: 28.6765, lon: 77.4321, aqi: 180 },

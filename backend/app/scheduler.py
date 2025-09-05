@@ -15,7 +15,7 @@ def main():
     out_csv = os.path.join(os.path.dirname(__file__), "../openaq_72h.csv")
     while True:
         try:
-            _ = run_pipeline(csv_out_path=out_csv, hours=72)
+            _ = run_pipeline(csv_out_path=out_csv, hours=168)
             train_main()
         except Exception:
             pass

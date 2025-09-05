@@ -334,45 +334,6 @@ function SettingsPage({ city, setCity, coords, setCoords, onCitySubmit }) {
           </div>
         </div>
 
-        {/* Data & Privacy */}
-        <div className="card" style={{ marginBottom: '2rem' }}>
-          <div className="card-header">
-            <h2 className="card-title">Data & Privacy</h2>
-            <p className="card-subtitle">Manage your data and privacy settings</p>
-          </div>
-          
-          <div style={{ display: 'grid', gap: '1.5rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>Location Tracking</div>
-                <div style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)' }}>
-                  Allow the app to access your location for better air quality data
-                </div>
-              </div>
-              <button className="btn btn-secondary">Manage</button>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>Data Export</div>
-                <div style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)' }}>
-                  Download your air quality history and settings
-                </div>
-              </div>
-              <button className="btn btn-secondary">Export</button>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>Clear Cache</div>
-                <div style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)' }}>
-                  Remove stored data to free up space
-                </div>
-              </div>
-              <button className="btn btn-secondary">Clear</button>
-            </div>
-          </div>
-        </div>
 
         {/* Reset Settings */}
         <div className="card">
