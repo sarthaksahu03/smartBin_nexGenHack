@@ -30,22 +30,41 @@ function AQIMap({ hotspots = [], safezones = [], center = [28.6139, 77.2090], zo
   // Generate realistic map points
   const generateMapPoints = () => {
     const points = [];
-    
-    // Generate hotspots
-    for (let i = 0; i < Math.min(hotspots.length, 4); i++) {
-      const angle = (i * 90) * (Math.PI / 180);
-      const distance = 0.01 + Math.random() * 0.02;
-      const lat = center[0] + distance * Math.cos(angle);
-      const lon = center[1] + distance * Math.sin(angle);
-      points.push({
-        type: 'hotspot',
-        lat,
-        lon,
-        aqi: 120 + Math.random() * 80,
-        radius: 300 + Math.random() * 200
+    // If center is Ghaziabad, add 5-6 fixed hotspot points
+    if (center[0] === 28.6692 && center[1] === 77.4538) {
+      const ghaziabadHotspots = [
+        { lat: 28.6765, lon: 77.4321, aqi: 180 },
+        { lat: 28.6700, lon: 77.4500, aqi: 210 },
+        { lat: 28.6600, lon: 77.4600, aqi: 195 },
+        { lat: 28.6800, lon: 77.4700, aqi: 205 },
+        { lat: 28.6650, lon: 77.4400, aqi: 170 },
+        { lat: 28.6750, lon: 77.4550, aqi: 220 }
+      ];
+      ghaziabadHotspots.forEach(h => {
+        points.push({
+          type: 'hotspot',
+          lat: h.lat,
+          lon: h.lon,
+          aqi: h.aqi,
+          radius: 4000
+        });
       });
+    } else {
+      // Generate hotspots
+      for (let i = 0; i < Math.min(hotspots.length, 4); i++) {
+        const angle = (i * 90) * (Math.PI / 180);
+        const distance = 0.01 + Math.random() * 0.02;
+        const lat = center[0] + distance * Math.cos(angle);
+        const lon = center[1] + distance * Math.sin(angle);
+        points.push({
+          type: 'hotspot',
+          lat,
+          lon,
+          aqi: 120 + Math.random() * 80,
+          radius: 4000 // 4km radius for all circles, including red
+        });
+      }
     }
-    
     // Generate safezones
     for (let i = 0; i < Math.min(safezones.length, 3); i++) {
       const angle = (i * 120) * (Math.PI / 180);
@@ -57,10 +76,9 @@ function AQIMap({ hotspots = [], safezones = [], center = [28.6139, 77.2090], zo
         lat,
         lon,
         aqi: 30 + Math.random() * 40,
-        radius: 200 + Math.random() * 150
+        radius: 4000 // 4km radius for all circles
       });
     }
-    
     return points;
   };
 
@@ -142,7 +160,7 @@ function AQIMap({ hotspots = [], safezones = [], center = [28.6139, 77.2090], zo
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           
-          {/* Current location marker */}
+          {/* Current location marker only, no big circles */}
           <Marker position={center} icon={createCustomIcon(currentAqi || 50)}>
             <Popup>
               <div>
@@ -157,7 +175,7 @@ function AQIMap({ hotspots = [], safezones = [], center = [28.6139, 77.2090], zo
             <React.Fragment key={index}>
               <Circle
                 center={[point.lat, point.lon]}
-                radius={point.radius}
+                radius={4000}
                 pathOptions={{
                   color: getAQIColor(point.aqi),
                   fillColor: getAQIColor(point.aqi),
