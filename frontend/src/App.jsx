@@ -5,6 +5,7 @@ import DashboardPage from './components/pages/DashboardPage.jsx';
 import AnalyticsPage from './components/pages/AnalyticsPage.jsx';
 import PollutantsPage from './components/pages/PollutantsPage.jsx';
 import MapPage from './components/pages/MapPage.jsx';
+import BlogsPage from './components/pages/BlogsPage.jsx';
 import SettingsPage from './components/pages/SettingsPage.jsx';
 
 function App() {
@@ -170,6 +171,8 @@ function App() {
             API_BASE={API_BASE}
           />
         );
+      case 'blogs':
+        return <BlogsPage />;
       case 'settings':
         return (
           <SettingsPage

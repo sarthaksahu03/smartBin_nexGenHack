@@ -6,6 +6,7 @@ function Navigation({ currentPage, onPageChange }) {
     { id: 'analytics', label: 'Analytics', icon: '📈' },
     { id: 'pollutants', label: 'Pollutants', icon: '🧪' },
     { id: 'map', label: 'Map', icon: '🗺️' },
+    { id: 'blogs', label: 'Blogs', icon: '📚' },
     { id: 'settings', label: 'Settings', icon: '⚙️' }
   ];
 
