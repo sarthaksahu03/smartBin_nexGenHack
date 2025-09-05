@@ -42,12 +42,14 @@ function AQIForecastChart({ forecast }) {
     return null;
   };
 
+  // Only show the last 12 hours if available
+  const forecast12 = forecast && forecast.length > 12 ? forecast.slice(-12) : forecast;
   return (
     <div className="card">
       <h2>📈 12-Hour Forecast</h2>
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={300}>
-          <AreaChart data={forecast}>
+          <AreaChart data={forecast12}>
             <defs>
               <linearGradient id="aqiGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#007bff" stopOpacity={0.3}/>

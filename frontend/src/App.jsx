@@ -98,10 +98,10 @@ function App() {
   }));
 
   return (
-    <div className="app-container">
-      {/* Header */}
-      <header className="app-header" style={{background: '#e3f2fd', padding: '1rem 0', borderBottom: '1px solid #bdbdbd'}}>
-        <nav style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: 900, margin: '0 auto'}}>
+    <div className="app-container" style={{margin: 0, padding: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column'}}>
+      {/* Header flush to top */}
+      <header className="app-header" style={{background: '#e3f2fd', padding: '1rem 0', borderBottom: '1px solid #bdbdbd', margin: 0, width: '100%'}}>
+        <nav style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', margin: 0, padding: '0 2vw'}}>
           <div>
             <h1 style={{margin: 0}}>🌬️ Safe Breath</h1>
             <p style={{margin: 0, fontSize: '1rem'}}>Real-time air quality monitoring & 12-hour predictions</p>
@@ -116,7 +116,7 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main style={{minHeight: '70vh'}}>
+      <main style={{flex: 1, minHeight: '70vh', margin: 0, padding: 0}}>
         <div className="search-container">
           <form onSubmit={handleCitySubmit} className="search-form">
             <input
@@ -166,9 +166,9 @@ function App() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer style={{background: '#e3f2fd', padding: '1rem 0', borderTop: '1px solid #bdbdbd', textAlign: 'center'}}>
-        <div style={{maxWidth: 900, margin: '0 auto', fontSize: '0.95rem'}}>
+      {/* Footer flush to bottom */}
+      <footer style={{background: '#e3f2fd', padding: '1rem 0', borderTop: '1px solid #bdbdbd', textAlign: 'center', margin: 0, width: '100%'}}>
+        <div style={{fontSize: '0.95rem'}}>
           <span>© {new Date().getFullYear()} Safe Breath | Made for NexGen Hackathon</span>
           <span style={{marginLeft: '1.5rem'}}>
             <a href="https://github.com/sarthaksahu03/smartBin_nexGenHack" target="_blank" rel="noopener noreferrer">GitHub</a>
