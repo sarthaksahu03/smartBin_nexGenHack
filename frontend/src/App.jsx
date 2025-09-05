@@ -99,50 +99,82 @@ function App() {
 
   return (
     <div className="app-container">
-      <div className="app-header">
-        <h1>🌬️ Safe Breath</h1>
-        <p>Real-time air quality monitoring and 12-hour predictions</p>
-      </div>
-      
-      <div className="search-container">
-        <form onSubmit={handleCitySubmit} className="search-form">
-          <input
-            type="text"
-            value={city}
-            onChange={handleCityChange}
-            placeholder="Enter city name (e.g., Delhi, Mumbai, New York)"
-            className="search-input"
-          />
-          <button type="submit" className="btn btn-primary">Search</button>
-          <button type="button" onClick={handleUseMyLocation} className="btn btn-secondary">
-            📍 My Location
-          </button>
-        </form>
-      </div>
+      {/* Header */}
+      <header className="app-header" style={{background: '#e3f2fd', padding: '1rem 0', borderBottom: '1px solid #bdbdbd'}}>
+        <nav style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: 900, margin: '0 auto'}}>
+          <div>
+            <h1 style={{margin: 0}}>🌬️ Safe Breath</h1>
+            <p style={{margin: 0, fontSize: '1rem'}}>Real-time air quality monitoring & 12-hour predictions</p>
+          </div>
+          <ul style={{listStyle: 'none', display: 'flex', gap: '1.5rem', margin: 0, padding: 0}}>
+            <li><a href="#dashboard">Dashboard</a></li>
+            <li><a href="#forecast">Forecast</a></li>
+            <li><a href="#map">Map</a></li>
+            <li><a href="#advisory">Advisory</a></li>
+          </ul>
+        </nav>
+      </header>
 
-      {loading ? (
-        <div className="loading">Loading air quality data...</div>
-      ) : (
-        <div className="dashboard-grid">
-          <AQIDashboard
-            aqi={current?.aqi}
-            components={current?.components}
-            station={current?.station}
-            city={current?.city}
-            state={current?.state}
-            last_update={current?.last_update}
-            pollutant_subindices={current?.pollutant_subindices}
-          />
-          <AQIForecastChart forecast={forecast} />
-          <HealthAdvisory aqi={current?.aqi} />
-          <AQIMap 
-            hotspots={hotspots} 
-            safezones={safezones} 
-            center={[coords.lat, coords.lon]} 
-            currentAqi={current?.aqi}
-          />
+      {/* Main Content */}
+      <main style={{minHeight: '70vh'}}>
+        <div className="search-container">
+          <form onSubmit={handleCitySubmit} className="search-form">
+            <input
+              type="text"
+              value={city}
+              onChange={handleCityChange}
+              placeholder="Enter city name (e.g., Delhi, Mumbai, New York)"
+              className="search-input"
+            />
+            <button type="submit" className="btn btn-primary">Search</button>
+            <button type="button" onClick={handleUseMyLocation} className="btn btn-secondary">
+              📍 My Location
+            </button>
+          </form>
         </div>
-      )}
+
+        {loading ? (
+          <div className="loading">Loading air quality data...</div>
+        ) : (
+          <div className="dashboard-grid">
+            <section id="dashboard">
+              <AQIDashboard
+                aqi={current?.aqi}
+                components={current?.components}
+                station={current?.station}
+                city={current?.city}
+                state={current?.state}
+                last_update={current?.last_update}
+                pollutant_subindices={current?.pollutant_subindices}
+              />
+            </section>
+            <section id="forecast">
+              <AQIForecastChart forecast={forecast} />
+            </section>
+            <section id="advisory">
+              <HealthAdvisory aqi={current?.aqi} />
+            </section>
+            <section id="map">
+              <AQIMap 
+                hotspots={hotspots} 
+                safezones={safezones} 
+                center={[coords.lat, coords.lon]} 
+                currentAqi={current?.aqi}
+              />
+            </section>
+          </div>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer style={{background: '#e3f2fd', padding: '1rem 0', borderTop: '1px solid #bdbdbd', textAlign: 'center'}}>
+        <div style={{maxWidth: 900, margin: '0 auto', fontSize: '0.95rem'}}>
+          <span>© {new Date().getFullYear()} Safe Breath | Made for NexGen Hackathon</span>
+          <span style={{marginLeft: '1.5rem'}}>
+            <a href="https://github.com/sarthaksahu03/smartBin_nexGenHack" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </span>
+        </div>
+      </footer>
     </div>
   );
 }

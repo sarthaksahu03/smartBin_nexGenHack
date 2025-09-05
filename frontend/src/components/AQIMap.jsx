@@ -66,20 +66,23 @@ function AQIMap({ hotspots = [], safezones = [], center = [28.6139, 77.2090], zo
 
   const mapPoints = generateMapPoints();
 
+  // Expanded AQI color ranges and fixed orange visibility
   const getAQIColor = (aqi) => {
-    if (aqi <= 50) return '#28a745';
-    if (aqi <= 100) return '#ffc107';
-    if (aqi <= 150) return '#fd7e14';
-    if (aqi <= 200) return '#dc3545';
-    return '#6f42c1';
+    if (aqi <= 50) return '#28a745'; // Green
+    if (aqi <= 100) return '#ffc107'; // Yellow
+    if (aqi <= 200) return '#fd7e14'; // Orange (expanded to 200)
+    if (aqi <= 300) return '#dc3545'; // Red
+    if (aqi <= 400) return '#6f42c1'; // Purple
+    return '#343a40'; // Dark for hazardous
   };
 
   const getAQICategory = (aqi) => {
     if (aqi <= 50) return 'Good';
     if (aqi <= 100) return 'Moderate';
-    if (aqi <= 150) return 'Unhealthy for Sensitive';
-    if (aqi <= 200) return 'Unhealthy';
-    return 'Very Unhealthy';
+    if (aqi <= 200) return 'Unhealthy for Sensitive';
+    if (aqi <= 300) return 'Unhealthy';
+    if (aqi <= 400) return 'Very Unhealthy';
+    return 'Hazardous';
   };
 
   // Custom marker icon
@@ -184,40 +187,28 @@ function AQIMap({ hotspots = [], safezones = [], center = [28.6139, 77.2090], zo
         fontSize: '0.85rem'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <div style={{ 
-            width: '12px', 
-            height: '12px', 
-            backgroundColor: '#28a745', 
-            borderRadius: '50%' 
-          }}></div>
-          <span style={{ color: '#666' }}>Good</span>
+          <div style={{ width: '12px', height: '12px', backgroundColor: '#28a745', borderRadius: '50%' }}></div>
+          <span style={{ color: '#666' }}>Good (0-50)</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <div style={{ 
-            width: '12px', 
-            height: '12px', 
-            backgroundColor: '#ffc107', 
-            borderRadius: '50%' 
-          }}></div>
-          <span style={{ color: '#666' }}>Moderate</span>
+          <div style={{ width: '12px', height: '12px', backgroundColor: '#ffc107', borderRadius: '50%' }}></div>
+          <span style={{ color: '#666' }}>Moderate (51-100)</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <div style={{ 
-            width: '12px', 
-            height: '12px', 
-            backgroundColor: '#fd7e14', 
-            borderRadius: '50%' 
-          }}></div>
-          <span style={{ color: '#666' }}>Unhealthy</span>
+          <div style={{ width: '12px', height: '12px', backgroundColor: '#fd7e14', borderRadius: '50%' }}></div>
+          <span style={{ color: '#666' }}>Unhealthy for Sensitive (101-200)</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <div style={{ 
-            width: '12px', 
-            height: '12px', 
-            backgroundColor: '#dc3545', 
-            borderRadius: '50%' 
-          }}></div>
-          <span style={{ color: '#666' }}>Very Unhealthy</span>
+          <div style={{ width: '12px', height: '12px', backgroundColor: '#dc3545', borderRadius: '50%' }}></div>
+          <span style={{ color: '#666' }}>Unhealthy (201-300)</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ width: '12px', height: '12px', backgroundColor: '#6f42c1', borderRadius: '50%' }}></div>
+          <span style={{ color: '#666' }}>Very Unhealthy (301-400)</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ width: '12px', height: '12px', backgroundColor: '#343a40', borderRadius: '50%' }}></div>
+          <span style={{ color: '#666' }}>Hazardous (401+)</span>
         </div>
       </div>
     </div>

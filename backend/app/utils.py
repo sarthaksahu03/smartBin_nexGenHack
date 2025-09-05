@@ -151,7 +151,7 @@ def fetch_current_aqi(lat=None, lon=None):
                 'state': latest_row['state'],
                 'pollutant_subindices': subindices,
                 'pollutant_avgs': pollutant_avgs,
-                'last_update': latest_time,
+                    'last_update': latest_time,
                 'source': 'Indian Historical Data',
                 'debug': {
                     'lat': lat,
