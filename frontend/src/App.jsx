@@ -1,41 +1,52 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import AQIDashboard from './components/AQIDashboard.jsx';
-import AQIForecastChart from './components/AQIForecastChart.jsx';
-import AQIMap from './components/AQIMap.jsx';
-import HealthAdvisory from './components/HealthAdvisory.jsx';
+import Navigation from './components/Navigation.jsx';
+import DashboardPage from './components/pages/DashboardPage.jsx';
+import AnalyticsPage from './components/pages/AnalyticsPage.jsx';
+import PollutantsPage from './components/pages/PollutantsPage.jsx';
+import MapPage from './components/pages/MapPage.jsx';
+import SettingsPage from './components/pages/SettingsPage.jsx';
 
 function App() {
+  const [currentPage, setCurrentPage] = useState('dashboard');
   const [current, setCurrent] = useState(null);
   const [forecast, setForecast] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [city, setCity] = useState('');
-  const [coords, setCoords] = useState({ lat: 28.6139, lon: 77.2090 }); // Default: Delhi
+  const [city, setCity] = useState('Delhi');
+  const [coords, setCoords] = useState({ lat: 28.6139, lon: 77.2090 });
+  const [latest, setLatest] = useState(null);
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
   useEffect(() => {
     fetchData(coords.lat, coords.lon);
     // eslint-disable-next-line
   }, [coords]);
 
+  useEffect(() => {
+    fetchLatest(city, coords);
+    const id = setInterval(() => fetchLatest(city, coords), 60000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line
+  }, [city, coords]);
+
   async function fetchData(lat, lon) {
     setLoading(true);
     try {
-      const curRes = await fetch(`http://localhost:8000/current?lat=${lat}&lon=${lon}`);
+      const curRes = await fetch(`${API_BASE}/current?lat=${lat}&lon=${lon}`);
       const curData = await curRes.json();
       setCurrent(curData);
-      const forecastRes = await fetch(`http://localhost:8000/forecast?lat=${lat}&lon=${lon}`);
+      const forecastRes = await fetch(`${API_BASE}/forecast?lat=${lat}&lon=${lon}`);
       const forecastData = await forecastRes.json();
       setForecast(forecastData.forecast || []);
     } catch (error) {
       console.error('Error fetching data:', error);
-      // Fallback data for demo
-      setCurrent({
-        aqi: 75,
-        city: 'Delhi',
-        state: 'Delhi',
-        station: 'Demo Station',
-        last_update: new Date().toISOString(),
-        pollutant_subindices: { 'PM2.5': 75, 'PM10': 65, 'NO2': 45 }
+      setCurrent({ 
+        aqi: 75, 
+        city: 'Delhi', 
+        state: 'Delhi', 
+        station: 'Demo Station', 
+        last_update: new Date().toISOString(), 
+        pollutant_subindices: { 'PM2.5': 75, 'PM10': 65, 'NO2': 45 } 
       });
       setForecast([
         { datetime: new Date(Date.now() + 3600000).toISOString(), aqi: 78 },
@@ -46,6 +57,17 @@ function App() {
     setLoading(false);
   }
 
+  async function fetchLatest(cityName, c) {
+    try {
+      const res = await fetch(`${API_BASE}/realtime?city=${encodeURIComponent(cityName)}&lat=${c.lat}&lon=${c.lon}&nocache=${Date.now()}`);
+      const data = await res.json();
+      setLatest(data || null);
+    } catch (e) {
+      console.error('Error fetching realtime snapshot:', e);
+      setLatest(null);
+    }
+  }
+
   function handleCityChange(e) {
     setCity(e.target.value);
   }
@@ -53,7 +75,6 @@ function App() {
   async function handleCitySubmit(e) {
     e.preventDefault();
     if (!city) return;
-    // Use OpenStreetMap Nominatim (free geocoding service)
     try {
       const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json&limit=1`);
       const geoData = await geoRes.json();
@@ -67,29 +88,13 @@ function App() {
     }
   }
 
-  function handleUseMyLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-        },
-        () => {
-          alert('Unable to retrieve your location');
-        }
-      );
-    } else {
-      alert('Geolocation is not supported by your browser');
-    }
-  }
-
-  // Generate realistic hotspots and safezones based on forecast data
   const hotspots = forecast.filter(f => f.aqi > 120).map((f, i) => ({
     lat: coords.lat + (Math.random() - 0.5) * 0.02,
     lon: coords.lon + (Math.random() - 0.5) * 0.02,
     aqi: f.aqi,
     time: f.datetime
   }));
-  
+
   const safezones = forecast.filter(f => f.aqi < 80).map((f, i) => ({
     lat: coords.lat + (Math.random() - 0.5) * 0.03,
     lon: coords.lon + (Math.random() - 0.5) * 0.03,
@@ -97,82 +102,153 @@ function App() {
     time: f.datetime
   }));
 
+  const latestAQI = latest?.aqi ?? current?.aqi;
+  const dominant = latest?.dominant_pollutant;
+  const extraSuggestions = (() => {
+    if (!dominant) return [];
+    if (dominant === 'PM2.5' || dominant === 'PM10') {
+      return [
+        'Deploy air purifying plants like Areca Palm, Money Plant, or Snake Plant in the affected zone.',
+        'Introduce water sprinkling on roads (common in Delhi)'
+      ];
+    }
+    if (dominant === 'NO2' || dominant === 'SO2') {
+      return [
+        'Promote carpooling, use public transport in next 12 hours.',
+        'Alert city authorities: Restrict heavy-duty trucks entry during peak hours.'
+      ];
+    }
+    if (dominant === 'OZONE') {
+      return [
+        'Reduce outdoor exercise during afternoon, encourage indoors.',
+        'Avoid solvents & paint usage today.'
+      ];
+    }
+    return [];
+  })();
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'dashboard':
+        return (
+          <DashboardPage
+            current={current}
+            forecast={forecast}
+            latest={latest}
+            latestAQI={latestAQI}
+            loading={loading}
+          />
+        );
+      case 'analytics':
+        return (
+          <AnalyticsPage
+            current={current}
+            latest={latest}
+            forecast={forecast}
+            API_BASE={API_BASE}
+          />
+        );
+      case 'pollutants':
+        return (
+          <PollutantsPage
+            current={current}
+            latest={latest}
+            forecast={forecast}
+            API_BASE={API_BASE}
+          />
+        );
+      case 'map':
+        return (
+          <MapPage
+            current={current}
+            forecast={forecast}
+            latest={latest}
+            coords={coords}
+            setCoords={setCoords}
+            city={city}
+            setCity={setCity}
+            API_BASE={API_BASE}
+          />
+        );
+      case 'settings':
+        return (
+          <SettingsPage
+            city={city}
+            setCity={setCity}
+            coords={coords}
+            setCoords={setCoords}
+            onCitySubmit={handleCitySubmit}
+          />
+        );
+      default:
+        return (
+          <DashboardPage
+            current={current}
+            forecast={forecast}
+            latest={latest}
+            latestAQI={latestAQI}
+            loading={loading}
+          />
+        );
+    }
+  };
+
   return (
-    <div className="app-container" style={{margin: 0, padding: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column'}}>
-      {/* Header flush to top */}
-      <header className="app-header" style={{background: '#e3f2fd', padding: '1rem 0', borderBottom: '1px solid #bdbdbd', margin: 0, width: '100%'}}>
-        <nav style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', margin: 0, padding: '0 2vw'}}>
-          <div>
-            <h1 style={{margin: 0}}>🌬️ Safe Breath</h1>
-            <p style={{margin: 0, fontSize: '1rem'}}>Real-time air quality monitoring & 12-hour predictions</p>
-          </div>
-          <ul style={{listStyle: 'none', display: 'flex', gap: '1.5rem', margin: 0, padding: 0}}>
-            <li><a href="#dashboard">Dashboard</a></li>
-            <li><a href="#forecast">Forecast</a></li>
-            <li><a href="#map">Map</a></li>
-            <li><a href="#advisory">Advisory</a></li>
-          </ul>
-        </nav>
-      </header>
-
-      {/* Main Content */}
-      <main style={{flex: 1, minHeight: '70vh', margin: 0, padding: 0}}>
-        <div className="search-container">
-          <form onSubmit={handleCitySubmit} className="search-form">
-            <input
-              type="text"
-              value={city}
-              onChange={handleCityChange}
-              placeholder="Enter city name (e.g., Delhi, Mumbai, New York)"
-              className="search-input"
-            />
-            <button type="submit" className="btn btn-primary">Search</button>
-            <button type="button" onClick={handleUseMyLocation} className="btn btn-secondary">
-              📍 My Location
-            </button>
-          </form>
-        </div>
-
-        {loading ? (
-          <div className="loading">Loading air quality data...</div>
-        ) : (
-          <div className="dashboard-grid">
-            <section id="dashboard">
-              <AQIDashboard
-                aqi={current?.aqi}
-                components={current?.components}
-                station={current?.station}
-                city={current?.city}
-                state={current?.state}
-                last_update={current?.last_update}
-                pollutant_subindices={current?.pollutant_subindices}
+    <div className="app-container">
+      <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
+      
+      <main className="main-content">
+        {/* Search Section - Only show on Dashboard */}
+        {currentPage === 'dashboard' && (
+          <div className="search-section">
+            <form onSubmit={handleCitySubmit} className="search-form">
+              <input 
+                type="text" 
+                value={city} 
+                onChange={handleCityChange} 
+                placeholder="Enter city name (e.g., Delhi, Mumbai)" 
+                className="search-input" 
               />
-            </section>
-            <section id="forecast">
-              <AQIForecastChart forecast={forecast} />
-            </section>
-            <section id="advisory">
-              <HealthAdvisory aqi={current?.aqi} />
-            </section>
-            <section id="map">
-              <AQIMap 
-                hotspots={hotspots} 
-                safezones={safezones} 
-                center={[coords.lat, coords.lon]} 
-                currentAqi={current?.aqi}
-              />
-            </section>
+              <button type="submit" className="btn btn-primary">Search</button>
+            </form>
           </div>
         )}
+
+        {/* Alert Banner - Only show on Dashboard */}
+        {currentPage === 'dashboard' && latest?.alert && (
+          <div className="alert-banner">
+            <div className="alert-content">
+              <div className="alert-text">
+                <div className="alert-title">⚠️ Mitigation Suggestion Mode</div>
+                <div className="alert-message">{latest.alert_message}</div>
+                <div style={{ marginBottom: '0.5rem' }}>
+                  <strong>Dominant pollutant:</strong> {latest.dominant_pollutant}
+                </div>
+                <div style={{ marginTop: '0.5rem', marginBottom: '0.5rem', fontWeight: '600' }}>
+                  🌍 Suggested Actions
+                </div>
+                <ul className="alert-actions">
+                  {(extraSuggestions.concat(latest.suggestions || [])).map((s, i) => (
+                    <li key={i}>{s}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="alert-aqi">{Math.round(latestAQI || 0)}</div>
+            </div>
+          </div>
+        )}
+
+        {renderPage()}
       </main>
 
-      {/* Footer flush to bottom */}
-      <footer style={{background: '#e3f2fd', padding: '1rem 0', borderTop: '1px solid #bdbdbd', textAlign: 'center', margin: 0, width: '100%'}}>
-        <div style={{fontSize: '0.95rem'}}>
-          <span>© {new Date().getFullYear()} Safe Breath | Made for NexGen Hackathon</span>
-          <span style={{marginLeft: '1.5rem'}}>
-            <a href="https://github.com/sarthaksahu03/smartBin_nexGenHack" target="_blank" rel="noopener noreferrer">GitHub</a>
-          </span>
+      <footer className="footer">
+        <div className="footer-content">
+          <span>© {new Date().getFullYear()} Safe Breath - Air Quality Monitoring</span>
+          <ul className="footer-links">
+            <li><a href="#" className="footer-link">GitHub</a></li>
+            <li><a href="#" className="footer-link">Documentation</a></li>
+            <li><a href="#" className="footer-link">Support</a></li>
+          </ul>
         </div>
       </footer>
     </div>

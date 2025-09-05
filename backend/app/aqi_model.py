@@ -132,7 +132,8 @@ def forecast_next_12_hours(lat=None, lon=None):
     source = 'OpenAQ'
     if pivot is None or len(pivot) < 2:
         # Train model using Indian historical data
-        model_data = train_aqi_model(lat, lon)
+        model_data = train_aqi_model(lat, lon) 
+    
         if model_data is None:
             return {'forecast': [], 'source': 'No data available', 'error': 'Insufficient historical data'}
         
